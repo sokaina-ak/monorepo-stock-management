@@ -1,0 +1,17 @@
+{
+  "name": "my-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm run dev --workspace=apps/frontend\" \"php artisan serve --cwd apps/backend\"",
+    "dev-frontend": "npm run dev --workspace=apps/frontend",
+    "dev-backend": "php artisan serve --cwd apps/backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
