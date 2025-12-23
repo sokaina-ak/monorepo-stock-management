@@ -22,11 +22,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Auth routes
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::middleware('auth:sanctum')->middleware('admin')->post('/auth/me', [AuthController::class, 'me']);
-Route::middleware('auth:sanctum')->middleware('admin')->post('/auth/refresh', [AuthController::class, 'refresh']);
+Route::middleware(['auth:sanctum', 'admin'])->post('/auth/me', [AuthController::class, 'me']);
+Route::middleware(['auth:sanctum', 'admin'])->post('/auth/refresh', [AuthController::class, 'refresh']);
 
 //Product routes
-Route::middleware('auth:sanctum')->middleware('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::get('/products', [ProductController::class, 'index']);
     Route::get('/products/search', [ProductController::class, 'search']);
     Route::get('/products/{id}', [ProductController::class, 'show']);
