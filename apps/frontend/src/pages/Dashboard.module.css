@@ -1,0 +1,496 @@
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ==================== welcome Section ==================== */
+.welcomeSection {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-lg);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #60A5FA 100%);
+  border-radius: var(--radius-lg);
+  color: white;
+}
+
+.welcomeContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.welcomeLabel {
+  font-size: var(--font-size-small);
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.welcomeTitle {
+  font-size: var(--font-size-h1);
+  font-weight: 600;
+  margin: 0;
+}
+
+.welcomeDate {
+  font-size: var(--font-size-body);
+  opacity: 0.85;
+  margin: 0;
+}
+
+.welcomeActions {
+  flex-shrink: 0;
+}
+
+.welcomeActions button {
+  background: white !important;
+  color: var(--color-accent) !important;
+  border: none !important;
+}
+
+.welcomeActions button:hover {
+  background: white !important;
+  color: var(--color-accent-hover) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ==================== Stats Grid ==================== */
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--spacing-md);
+}
+
+.statCard {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.statHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.statIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+}
+
+.statTrend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-label);
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: var(--radius-full);
+}
+
+.trendUp {
+  color: var(--color-success);
+  background-color: var(--color-success-light);
+}
+
+.trendDown {
+  color: var(--color-error);
+  background-color: var(--color-error-light);
+}
+
+.statBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.2;
+}
+
+.statLabel {
+  font-size: var(--font-size-small);
+  color: var(--color-text-secondary);
+}
+
+.statFooter {
+  padding-top: var(--spacing-xs);
+  border-top: 1px solid var(--color-border);
+}
+
+.statTrendLabel {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+/* ==================== content grid ==================== */
+.contentGrid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: var(--spacing-lg);
+}
+
+.leftColumn,
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ==================== Card Header ==================== */
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.cardTitle {
+  font-size: var(--font-size-h2);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.viewAllBtn {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  transition: var(--transition-fast);
+}
+
+.viewAllBtn:hover {
+  background-color: var(--color-accent-light);
+}
+
+/* ==================== Activity Card ==================== */
+.activityCard {
+  padding: var(--spacing-lg);
+}
+
+.activityList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.activityItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+}
+
+.activityItem:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.activityIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.activityContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.activityTitle {
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.activityDesc {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activityTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+/* ==================== Quick Stats Card ==================== */
+.quickStatsCard {
+  padding: var(--spacing-lg);
+}
+
+.quickStatsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.quickStatItem {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.quickStatInfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.quickStatLabel {
+  font-size: var(--font-size-small);
+  color: var(--color-text-primary);
+}
+
+.quickStatValue {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.quickStatBar {
+  height: 8px;
+  background-color: var(--color-bg-secondary);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.quickStatFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  transition: width 0.8s ease-out;
+}
+
+/* ==================== Top Products Card ==================== */
+.topProductsCard {
+  padding: var(--spacing-lg);
+}
+
+.productsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.productItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border-radius: var(--radius-md);
+  transition: var(--transition-fast);
+}
+
+.productItem:hover {
+  background-color: var(--color-bg-secondary);
+}
+
+.productRank {
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  width: 24px;
+  flex-shrink: 0;
+}
+
+.productImage {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  background-color: var(--color-bg-secondary);
+  flex-shrink: 0;
+}
+
+.productInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.productName {
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.productCategory {
+  font-size: var(--font-size-label);
+  color: var(--color-text-secondary);
+}
+
+.productStats {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.productRating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-label);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.productRevenue {
+  font-size: var(--font-size-small);
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+/* ==================== Quick Actions Card ==================== */
+.quickActionsCard {
+  padding: var(--spacing-lg);
+}
+
+.quickActionsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.quickActionBtn {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  width: 100%;
+  padding: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  text-align: left;
+  font-size: var(--font-size-small);
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.quickActionBtn:hover {
+  border-color: var(--color-accent);
+  background: var(--color-accent-light);
+}
+
+.quickActionBtn:hover .quickActionIcon {
+  background: var(--color-accent);
+  color: white;
+}
+
+.quickActionBtn:hover .quickActionArrow {
+  color: var(--color-accent);
+  transform: translate(2px, -2px);
+}
+
+.quickActionIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: white;
+  border-radius: var(--radius-md);
+  color: var(--color-text-secondary);
+  transition: var(--transition-fast);
+}
+
+.quickActionArrow {
+  margin-left: auto;
+  color: var(--color-text-secondary);
+  transition: var(--transition-fast);
+}
+
+/* ==================== Responsive Design ==================== */
+
+/* Tablet */
+@media (max-width: 1024px) {
+  .statsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .contentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .welcomeSection {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+  }
+
+  .welcomeTitle {
+    font-size: 20px;
+  }
+
+  .statsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .statCard {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-md);
+  }
+
+  .statHeader {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+
+  .statBody {
+    flex: 1;
+  }
+
+  .statFooter {
+    display: none;
+  }
+
+  .activityTime {
+    display: none;
+  }
+
+  .productStats {
+    display: none;
+  }
+}
