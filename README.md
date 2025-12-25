@@ -136,13 +136,7 @@ Make sure you have these installed:
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone https://github.com/sokaina-ak/monorepo-stock-management.git
-cd my-monorepo
-```
-
-2. Install dependencies:
+1. Install dependencies:
 ```bash
 npm install
 cd apps/frontend
@@ -151,7 +145,7 @@ cd ../backend
 composer install
 ```
 
-3. Set up the backend:
+2. Set up the backend:
 ```bash
 cd apps/backend
 cp .env.example .env
