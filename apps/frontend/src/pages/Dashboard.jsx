@@ -27,29 +27,58 @@ import styles from './Dashboard.module.css';
 function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  // all states for api data
+  // state for dashboard data
   const [loading, setLoading] = useState(true);
   const [totalProducts, setTotalProducts] = useState(0);
   const [categories, setCategories] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
 
-  // fetch data on mount
+  // fetch all dashboard data when component mounts
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
         setLoading(true);
-        // fetch all data together
+        // fetch products and categories in parallel
         const [productsData, categoriesData] = await Promise.all([
-          productService.getAll(200, 0), //can change needed limit
+          productService.getAll(200, 0),
           productService.getCategories(),
         ]);
-        //set total products and categories
-        setTotalProducts(productsData.products?.length || productsData.total || 0);
-        // Categories can be array of slugs (strings) or objects with slug/name
+        // set total products count
+        const allProducts = productsData.products || [];
+        const total = allProducts.length;
+        setTotalProducts(total);
+
+        // count how many products are in each category
+        const categoryCounts = {};
+        allProducts.forEach(product => {
+          const category = product.category || '';
+          if (category) {
+            categoryCounts[category] = (categoryCounts[category] || 0) + 1;
+          }
+        });
+
+        // categories can be strings or objects with slug/name
         const categorySlugs = categoriesData.map(cat => typeof cat === 'string' ? cat : (cat.slug || cat.name || cat));
-        setCategories(categorySlugs.slice(0, 5));
-        //top 5 products by rating
-        const sortedByRating = [...productsData.products]
+        
+        // create categories with product count and percentage
+        const categoriesWithStats = categorySlugs
+          .map(catSlug => {
+            const count = categoryCounts[catSlug] || 0;
+            const percentage = total > 0 ? Math.round((count / total) * 100) : 0;
+            return {
+              slug: catSlug,
+              count,
+              percentage,
+            };
+          })
+          .filter(cat => cat.count > 0) // only show categories that have products
+          .sort((a, b) => b.count - a.count) // sort by count, highest first
+          .slice(0, 5); // show top 5 categories
+
+        setCategories(categoriesWithStats);
+        
+        // get top 5 products sorted by rating
+        const sortedByRating = [...allProducts]
           .sort((a, b) => b.rating - a.rating)
           .slice(0, 5);
         setTopProducts(sortedByRating);
@@ -62,26 +91,29 @@ function Dashboard() {
     fetchDashboardData();
   }, []);
 
-//here formating all what i want to be clean
-  //format current date
+  // format current date nicely
   const currentDate = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   });
-  // greeting based on time
+  
+  // get greeting based on time of day
   const getGreeting = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
     if (hour < 18) return 'Good afternoon';
     return 'Good evening';
   };
-  //format price
+  
+  // format price as currency
   const formatPrice = (price) => `$${price.toFixed(2)}`;
-  //capitalize helper
+  
+  // helper to capitalize and format category names
   const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1).replace(/-/g, ' ');
-  //info about app but here are just place holders except products from api
+  
+  // dashboard stats (most are placeholders except products count which comes from api)
   const stats = [
     {
       label: 'Total Sales',
@@ -163,7 +195,7 @@ function Dashboard() {
     },
   ];
 
-  //quick colors for category bars
+  // colors for category progress bars
   const categoryColors = [
     'var(--color-accent)',
     'var(--color-success)',
@@ -173,7 +205,7 @@ function Dashboard() {
   ];
   return (
     <div className={styles.dashboard}>
-      {/*welcome Section */}
+      {/* welcome section with greeting and quick action */}
       <div className={styles.welcomeSection}>
         <div className={styles.welcomeContent}>
           <span className={styles.welcomeLabel}>{getGreeting()}</span>
@@ -190,7 +222,7 @@ function Dashboard() {
         </div>
       </div>
 
-      {/*state grid */}
+      {/* stats cards grid */}
       <div className={styles.statsGrid}>
         {stats.map((stat) => (
           <Card key={stat.label} className={styles.statCard}>
@@ -219,18 +251,18 @@ function Dashboard() {
         ))}
       </div>
 
-      {/*main Content*/}
+      {/* main content area */}
       <div className={styles.contentGrid}>
-        {/* left Column */}
+        {/* left column */}
         <div className={styles.leftColumn}>
-          {/*categories from api */}
+          {/* product categories card */}
           <Card className={styles.quickStatsCard}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Product Categories</h2>
             </div>
             <div className={styles.quickStatsList}>
               {loading ? (
-                //loading skeletons
+                // loading skeleton placeholders
                 Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className={styles.quickStatItem}>
                     <Skeleton width="100%" height="32px" />
@@ -238,15 +270,16 @@ function Dashboard() {
                 ))
               ) : (
                 categories.map((cat, index) => (
-                  <div key={cat} className={styles.quickStatItem}>
+                  <div key={cat.slug} className={styles.quickStatItem}>
                     <div className={styles.quickStatInfo}>
-                      <span className={styles.quickStatLabel}>{capitalize(cat)}</span>
+                      <span className={styles.quickStatLabel}>{capitalize(cat.slug)}</span>
+                      <span className={styles.quickStatValue}>{cat.percentage}% ({cat.count})</span>
                     </div>
                     <div className={styles.quickStatBar}>
                       <div
                         className={styles.quickStatFill}
                         style={{
-                          width: `${85 - index * 15}%`,
+                          width: `${cat.percentage}%`,
                           backgroundColor: categoryColors[index % categoryColors.length],
                         }}
                       />
@@ -257,7 +290,7 @@ function Dashboard() {
             </div>
           </Card>
 
-          {/*recent activity*/}
+          {/* recent activity feed */}
           <Card className={styles.activityCard}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Recent Activity</h2>
@@ -288,7 +321,7 @@ function Dashboard() {
 
         {/* right column */}
         <div className={styles.rightColumn}>
-          {/*top products by rating from api */}
+          {/* top rated products card */}
           <Card className={styles.topProductsCard}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Top Rated Products</h2>
@@ -301,7 +334,7 @@ function Dashboard() {
             </div>
             <div className={styles.productsList}>
               {loading ? (
-                //loading skeletons
+                // loading skeleton placeholders
                 Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className={styles.productItem}>
                     <Skeleton width="24px" height="24px" />
@@ -342,7 +375,7 @@ function Dashboard() {
             </div>
           </Card>
 
-          {/*quick actions */}
+          {/* quick action buttons */}
           <Card className={styles.quickActionsCard}>
             <div className={styles.cardHeader}>
               <h2 className={styles.cardTitle}>Quick Actions</h2>

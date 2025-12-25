@@ -4,7 +4,7 @@ import styles from './ProtectedRoute.module.css';
 
 function ProtectedRoute() {
   const { isAuthenticated, loading } = useAuth();
-  //loading spinner while checking auth
+  // show loading spinner while checking authentication
   if (loading) {
     return (
       <div className={styles.loading}>
@@ -13,7 +13,7 @@ function ProtectedRoute() {
       </div>
     );
   }
-  // to login if not authenticated
+  // redirect to login if user is not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

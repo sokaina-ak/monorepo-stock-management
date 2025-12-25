@@ -8,20 +8,22 @@ function Header() {
   const location = useLocation();
   const { user } = useAuth();
 
-  //title on route
-        const getPageTitle = () => {
-          const path = location.pathname;
-          if (path === '/dashboard') return 'Dashboard';
-          if (path === '/products') return 'Products';
-          if (path === '/products/new') return 'Add Product';
-          if (path.match(/\/products\/\d+\/edit/)) return 'Edit Product';
-          if (path.match(/\/products\/\d+/)) return 'Product Details';
-          if (path === '/categories') return 'Categories';
-          if (path === '/categories/new') return 'Add Category';
-          if (path.match(/\/categories\/\d+\/edit/)) return 'Edit Category';
-          if (path.match(/\/categories\/\d+/)) return 'Category Details';
-          return 'Dashboard';
-        };
+  // get page title based on current route
+  const getPageTitle = () => {
+    const path = location.pathname;
+    if (path === '/dashboard') return 'Dashboard';
+    if (path === '/products') return 'Products';
+    if (path === '/products/new') return 'Add Product';
+    if (path.match(/\/products\/\d+\/edit/)) return 'Edit Product';
+    if (path.match(/\/products\/\d+/)) return 'Product Details';
+    if (path === '/categories') return 'Categories';
+    if (path === '/categories/new') return 'Add Category';
+    if (path.match(/\/categories\/\d+\/edit/)) return 'Edit Category';
+    if (path.match(/\/categories\/\d+/)) return 'Category Details';
+    if (path === '/orders') return 'Orders';
+    if (path.match(/\/orders\/\d+/)) return 'Order Details';
+    return 'Dashboard';
+  };
 
   return (
     <header className={styles.header}>

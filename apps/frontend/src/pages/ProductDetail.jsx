@@ -14,7 +14,7 @@ function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
-//states
+  // component state
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -22,7 +22,7 @@ function ProductDetail() {
   const [deleting, setDeleting] = useState(false);
   const [selectedImage, setSelectedImage] = useState(0);
 
-  //fetch product
+  // fetch product data
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -42,7 +42,7 @@ function ProductDetail() {
     fetchProduct();
   }, [id]);
 
-  //delete confirmation
+  // handle product deletion
   const handleDelete = async () => {
     try {
       setDeleting(true);
@@ -57,13 +57,13 @@ function ProductDetail() {
       setDeleteModalOpen(false);
     }
   };
-  //stock status badge
+  // get stock status badge configuration
   const getStockBadge = (stock) => {
     if (stock === 0) return { variant: 'error', text: 'Out of Stock' };
     if (stock < 10) return { variant: 'warning', text: 'Low Stock' };
     return { variant: 'success', text: 'In Stock' };
   };
-  //format price with currency and discount
+  // format price as currency
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -73,7 +73,7 @@ function ProductDetail() {
   const getDiscountedPrice = (price, discount) => {
     return price - (price * discount / 100);
   };
-  //star rating
+  // render star rating display
   const renderStars = (rating) => {
     const numRating = Number(rating) || 0;
     const stars = [];
@@ -97,7 +97,7 @@ function ProductDetail() {
     return stars;
   };
 
-  //loading skeleton
+  // loading skeleton state
   if (loading) {
     return (
       <div className={styles.container}>
@@ -123,7 +123,7 @@ function ProductDetail() {
       </div>
     );
   }
-  //error state
+  // error state
   if (error) {
     return (
       <div className={styles.container}>
@@ -150,7 +150,7 @@ function ProductDetail() {
       </Link>
 
       <div className={styles.content}>
-        {/*image Gallery */}
+        {/* image gallery */}
         <div className={styles.imageSection}>
           <div className={styles.mainImage}>
             <img
@@ -164,7 +164,7 @@ function ProductDetail() {
             )}
           </div>
 
-          {/*thumbnail gallery */}
+          {/* thumbnail gallery */}
           {product.images && product.images.length > 1 && (
             <div className={styles.thumbnails}>
               {product.images.map((img, index) => (
@@ -180,7 +180,7 @@ function ProductDetail() {
           )}
         </div>
 
-        {/*product info */}
+        {/* product information */}
         <div className={styles.infoSection}>
           <div className={styles.header}>
             <div className={styles.categoryRow}>
@@ -269,7 +269,7 @@ function ProductDetail() {
         </div>
       </div>
 
-      {/*reviews section */}
+      {/* customer reviews section */}
       {product.reviews && product.reviews.length > 0 && (
         <div className={styles.reviewsSection}>
           <h2>Customer Reviews</h2>
@@ -293,7 +293,7 @@ function ProductDetail() {
           </div>
         </div>
       )}
-      {/*deley confirm modal */}
+      {/* delete confirmation modal */}
       <Modal
         isOpen={deleteModalOpen}
         onClose={() => setDeleteModalOpen(false)}

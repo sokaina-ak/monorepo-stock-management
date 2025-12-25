@@ -7,36 +7,41 @@ function useProducts(initialLimit = 12) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  //for pagination 
+  // pagination state
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [limit] = useState(initialLimit);
-  //foe search
+  
+  // search state
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
-  //for category filter 
+  
+  // category filter state
   const [category, setCategory] = useState('all');
-  //for stock filter
-  const [stockFilter, setStockFilter] = useState(null); // null, 'inStock', 'lowStock', 'outOfStock'
+  
+  // stock filter state (null, 'inStock', 'lowStock', 'outOfStock')
+  const [stockFilter, setStockFilter] = useState(null);
 
- //live search
+  // fetch products based on current filters and pagination
   const fetchProducts = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      // If stock filter is active OR search + category filter together, fetch more and filter client-side
-      // Otherwise, use pagination
-      const shouldFetchAll = stockFilter !== null || (searchQuery.trim() && category && category !== 'all');
-      const fetchLimit = shouldFetchAll ? 1000 : limit;
+      // if stock filter is active, we need to fetch all products for client-side filtering
+      // if no filters at all, fetch all to get total count, then paginate
+      // otherwise use normal pagination
+      const hasNoFilters = !stockFilter && !searchQuery.trim() && (!category || category === 'all');
+      const shouldFetchAll = stockFilter !== null || hasNoFilters;
+      const fetchLimit = shouldFetchAll ? 10000 : limit;
       const skip = shouldFetchAll ? 0 : (page - 1) * limit;
       
       let data;
-      // Handle search + category filter together
+      // handle search + category filter together
       if (searchQuery.trim() && category && category !== 'all') {
-        // Search within a specific category - fetch category products then filter by search
+        // search within a specific category - fetch category products then filter by search term
         setIsSearching(true);
         data = await productService.getByCategory(category, fetchLimit, skip);
-        // Filter by search query client-side
+        // filter by search query on the client side
         const searchLower = searchQuery.toLowerCase().trim();
         let categoryProducts = data.products || [];
         categoryProducts = categoryProducts.filter(product => 
@@ -50,18 +55,18 @@ function useProducts(initialLimit = 12) {
         setIsSearching(false);
         data = await productService.getByCategory(category, fetchLimit, skip);
       } else if (searchQuery.trim()) {
-        // search only (no category filter, but stock filter may be active)
+        // search only (no category filter, but stock filter might be active)
         setIsSearching(true);
         data = await productService.search(searchQuery.trim(), fetchLimit, skip);
       } else {
-        // all products (no search, no category filter)
+        // show all products (no search, no category filter)
         setIsSearching(false);
         data = await productService.getAll(fetchLimit, skip);
       }
 
       let products = data.products || [];
 
-      // Apply stock filter if active (works with search and category filters)
+      // apply stock filter if active (works with search and category filters)
       if (stockFilter) {
         products = products.filter((product) => {
           const stock = Number(product.stock) || 0;
@@ -78,16 +83,27 @@ function useProducts(initialLimit = 12) {
         });
       }
 
-      // Store total before pagination
+      // store total count before pagination
       const filteredTotal = products.length;
 
-      // Apply pagination to filtered results
-      const startIndex = (page - 1) * limit;
-      products = products.slice(startIndex, startIndex + limit);
+      // apply pagination to filtered results if we fetched all products
+      if (shouldFetchAll) {
+        const startIndex = (page - 1) * limit;
+        products = products.slice(startIndex, startIndex + limit);
+      }
 
       setProducts(products);
-      // Use filtered total if we applied client-side filtering (stock filter or search+category)
-      setTotal((stockFilter || (searchQuery.trim() && category && category !== 'all')) ? filteredTotal : (data.total || filteredTotal));
+      // set total count - use filtered total for client-side filtering, otherwise estimate
+      if (stockFilter || hasNoFilters) {
+        setTotal(filteredTotal);
+      } else if (searchQuery.trim() && category && category !== 'all') {
+        setTotal(filteredTotal);
+      } else {
+        // for normal pagination, estimate total based on returned products
+        // if we got a full page, assume there might be more
+        const estimatedTotal = products.length === limit ? (page * limit) + 1 : (page - 1) * limit + products.length;
+        setTotal(Math.max(filteredTotal, estimatedTotal));
+      }
 
     } catch (err) {
       console.error('Error fetching products:', err);
@@ -97,33 +113,35 @@ function useProducts(initialLimit = 12) {
     }
   }, [page, limit, searchQuery, category, stockFilter]);
 
-  //featch products when dependencies change
+  // fetch products whenever dependencies change
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
 
-  
+  // search handler
   const search = useCallback((query) => {
     setSearchQuery(query);
-    // Don't clear filters when searching - allow search + filters to work together
+    // keep other filters active when searching
     setPage(1);
   }, []);
 
+  // category filter handler
   const filterByCategory = useCallback((cat) => {
     setCategory(cat);
-    setSearchQuery(''); // clear search when filtering by category
-    // Don't clear stock filter - allow category + stock filter to work together
+    setSearchQuery(''); // clear search when changing category
+    // keep stock filter active
     setPage(1);
   }, []);
 
+  // stock filter handler (toggles off if same filter clicked)
   const filterByStock = useCallback((filter) => {
-    setStockFilter(filter === stockFilter ? null : filter); // toggle if same filter clicked
+    setStockFilter(filter === stockFilter ? null : filter);
     setSearchQuery(''); // clear search when filtering by stock
-    // Don't clear category - allow stock filter + category filter to work together
+    // keep category filter active
     setPage(1);
   }, [stockFilter]);
 
-  //clear all filters and reload 
+  // clear all filters and reset to default
   const clearFilters = useCallback(() => {
     setSearchQuery('');
     setCategory('all');
@@ -131,29 +149,30 @@ function useProducts(initialLimit = 12) {
     setPage(1);
   }, []);
 
+  // pagination handler
   const goToPage = useCallback((newPage) => {
     setPage(newPage);
   }, []);
 
-  //delete
+  // delete product handler
   const deleteProduct = useCallback(async (id) => {
     await productService.delete(id);
     setProducts((prev) => prev.filter((p) => p.id !== id));
     setTotal((prev) => prev - 1);
   }, []);
 
-  //calc pagination 
+  // calculate pagination values
   const totalPages = Math.ceil(total / limit);
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
 
   return {
-    // data
+    // product data
     products,
     loading,
     error,
 
-    // oagination
+    // pagination
     page,
     totalPages,
     total,
@@ -166,7 +185,7 @@ function useProducts(initialLimit = 12) {
     isSearching,
     search,
 
-    // category
+    // category filter
     category,
     filterByCategory,
 

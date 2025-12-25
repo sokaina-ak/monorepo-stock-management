@@ -36,6 +36,7 @@ function Categories() {
     return localStorage.getItem('categoriesView') || 'grid';
   });
   const [searchInput, setSearchInput] = useState('');
+  const [typeFilter, setTypeFilter] = useState(null); // null, 'main', 'sub'
   const [deleteModal, setDeleteModal] = useState({ open: false, category: null });
   const [deleting, setDeleting] = useState(false);
   const [page, setPage] = useState(1);
@@ -59,15 +60,28 @@ function Categories() {
     fetchCategories();
   }, []);
 
-  // Filter categories based on search
+  // filter categories based on search and type filter
   const filteredCategories = useMemo(() => {
-    if (!searchInput.trim()) return categories;
-    const query = searchInput.toLowerCase();
-    return categories.filter(cat => 
-      cat.name?.toLowerCase().includes(query) ||
-      cat.slug?.toLowerCase().includes(query)
-    );
-  }, [categories, searchInput]);
+    let filtered = categories;
+    
+    // apply type filter (main categories or subcategories)
+    if (typeFilter === 'main') {
+      filtered = filtered.filter(c => !c.parent_id);
+    } else if (typeFilter === 'sub') {
+      filtered = filtered.filter(c => c.parent_id);
+    }
+    
+    // apply search filter
+    if (searchInput.trim()) {
+      const query = searchInput.toLowerCase();
+      filtered = filtered.filter(cat => 
+        cat.name?.toLowerCase().includes(query) ||
+        cat.slug?.toLowerCase().includes(query)
+      );
+    }
+    
+    return filtered;
+  }, [categories, searchInput, typeFilter]);
 
   // Pagination
   const totalPages = Math.ceil(filteredCategories.length / limit);
@@ -76,7 +90,7 @@ function Categories() {
     return filteredCategories.slice(start, start + limit);
   }, [filteredCategories, page, limit]);
 
-  // Stats
+  // stats configuration with filter keys
   const stats = [
     {
       label: 'Total Categories',
@@ -84,6 +98,7 @@ function Categories() {
       icon: Tag,
       color: 'var(--color-accent)',
       bgColor: 'var(--color-accent-light)',
+      filterKey: null, // no filter for total
     },
     {
       label: 'Main Categories',
@@ -91,6 +106,7 @@ function Categories() {
       icon: FolderTree,
       color: 'var(--color-success)',
       bgColor: 'var(--color-success-light)',
+      filterKey: 'main',
     },
     {
       label: 'Subcategories',
@@ -98,6 +114,7 @@ function Categories() {
       icon: AlertTriangle,
       color: 'var(--color-warning)',
       bgColor: 'var(--color-warning-light)',
+      filterKey: 'sub',
     },
   ];
 
@@ -106,8 +123,16 @@ function Categories() {
     localStorage.setItem('categoriesView', newView);
   };
 
+  // handle type filter click (toggle off if same filter clicked)
+  const handleTypeFilter = (filterKey) => {
+    setTypeFilter(filterKey === typeFilter ? null : filterKey);
+    setSearchInput(''); // clear search when filtering
+    setPage(1);
+  };
+
   const handleClearSearch = () => {
     setSearchInput('');
+    setTypeFilter(null); // also clear type filter
     setPage(1);
   };
 
@@ -197,10 +222,12 @@ function Categories() {
         {stats.map((stat, index) => (
           <motion.div
             key={stat.label}
-            className={styles.statItem}
+            className={`${styles.statItem} ${stat.filterKey && typeFilter === stat.filterKey ? styles.statItemActive : ''}`}
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
+            onClick={() => stat.filterKey && handleTypeFilter(stat.filterKey)}
+            data-clickable={stat.filterKey ? 'true' : 'false'}
           >
             <div
               className={styles.statIcon}
@@ -253,16 +280,22 @@ function Categories() {
         </div>
       </div>
 
-      {/* Search status */}
-      {searchInput && (
+      {/* active filters indicator */}
+      {(searchInput || typeFilter) && (
         <motion.div
           className={styles.searchStatus}
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
         >
-          Results for "<strong>{searchInput}</strong>" ({filteredCategories.length} found)
+          {searchInput && (
+            <span>Results for "<strong>{searchInput}</strong>"</span>
+          )}
+          {typeFilter && (
+            <span>Filter: <strong>{typeFilter === 'main' ? 'Main Categories' : 'Subcategories'}</strong></span>
+          )}
+          <span>({filteredCategories.length} found)</span>
           <button onClick={handleClearSearch} className={styles.clearSearchLink}>
-            Clear search
+            Clear {searchInput && typeFilter ? 'filters' : searchInput ? 'search' : 'filter'}
           </button>
         </motion.div>
       )}

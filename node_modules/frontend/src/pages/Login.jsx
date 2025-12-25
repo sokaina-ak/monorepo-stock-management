@@ -13,13 +13,14 @@ function Login() {
   const { login, isAuthenticated, loading: authLoading } = useAuth();
   const { showToast } = useToast();
   
-  // Redirect if already authenticated
+  // redirect to dashboard if user is already logged in
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
       navigate('/dashboard', { replace: true });
     }
   }, [isAuthenticated, authLoading, navigate]);
-  //all states
+  
+  // form state
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -33,10 +34,11 @@ function Login() {
       ...prev,
       [name]: value,
     }));
-    //clear error when user starts typing
+    // clear error message when user starts typing
     if (error) setError('');
   };
-  //submission
+  
+  // handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -54,7 +56,7 @@ function Login() {
     }
   };
 
-  // Show loading spinner while checking auth
+  // show loading spinner while checking authentication
   if (authLoading) {
     return (
       <div className={styles.container} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
@@ -65,7 +67,7 @@ function Login() {
 
   return (
     <div className={styles.container}>
-      {/*illustration*/}
+      {/* left side illustration */}
       <div className={styles.illustrationSide}>
         <img
           src={authIllustration}
@@ -74,7 +76,7 @@ function Login() {
         />
       </div>
 
-      {/*login form */}
+      {/* login form card */}
       <div className={styles.card}>
         <div className={styles.header}>
           <h1 className={styles.title}>Welcome Back</h1>
@@ -100,7 +102,7 @@ function Login() {
             error={error && !formData.password ? 'Password is required' : ''}
           />
 
-          {/*error message */}
+          {/* error message display */}
           {error && formData.username && formData.password && (
             <p className={styles.error}>{error}</p>
           )}
@@ -114,6 +116,11 @@ function Login() {
             Sign In
           </Button>
         </form>
+        
+        {/* test credentials hint for quick login */}
+        <div className={styles.hint}>
+          <p>Test credentials: <strong>adminuser</strong> / <strong>admin</strong></p>
+        </div>
       </div>
     </div>
   );

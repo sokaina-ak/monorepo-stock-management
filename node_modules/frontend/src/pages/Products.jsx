@@ -29,7 +29,7 @@ import styles from './Products.module.css';
 function Products() {
   const navigate = useNavigate();
   const { showToast } = useToast();
-  //hook for data management
+  // hook for managing product data
   const {
     products,
     loading,
@@ -51,7 +51,7 @@ function Products() {
     deleteProduct,
   } = useProducts(12);
 
-  //all states
+  // component state
   const [view, setView] = useState(() => {
     return localStorage.getItem('productsView') || 'grid';
   });
@@ -65,14 +65,13 @@ function Products() {
     lowStock: 0,
     outOfStock: 0,
   });
-  //fetch categories
+  // fetch categories list
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        // Use categoryService instead of productService to get full category data
+        // use category service to get full category data
         const data = await categoryService.getCategories();
-        console.log('Products page - Fetched categories:', data); // Debug log
-        // Extract slugs from category objects
+        // extract slugs from category objects
         if (Array.isArray(data) && data.length > 0) {
           const slugs = data.map(cat => typeof cat === 'string' ? cat : (cat.slug || cat.name));
           setCategories(slugs.filter(slug => slug));
@@ -88,7 +87,7 @@ function Products() {
     };
     fetchCategories();
   }, []);
-  //fetch all products to calculate real stats
+  // fetch all products to calculate stats
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -103,7 +102,7 @@ function Products() {
         setProductStats(stats);
       } catch (err) {
         console.error('Failed to fetch stats:', err);
-        // Don't crash the page if stats fail to load
+        // use default values if stats fail to load
         setProductStats({
           total: 0,
           inStock: 0,
@@ -115,7 +114,7 @@ function Products() {
     fetchStats();
   }, []);
 
-  //stats to display
+  // stats cards configuration
   const stats = [
     {
       label: 'Total Products',
@@ -123,7 +122,7 @@ function Products() {
       icon: Package,
       color: 'var(--color-accent)',
       bgColor: 'var(--color-accent-light)',
-      filterKey: null, // No filter for total
+      filterKey: null, // no filter for total count
     },
     {
       label: 'In Stock',
@@ -151,7 +150,7 @@ function Products() {
     },
   ];
 
-  //debounced search
+  // debounced search with 300ms delay
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchInput.trim()) {
@@ -163,22 +162,25 @@ function Products() {
     return () => clearTimeout(timer);
   }, [searchInput, search, searchQuery, clearFilters]);
 
-  //save view preference in local storage
+  // save view preference to local storage
   const handleViewChange = (newView) => {
     setView(newView);
     localStorage.setItem('productsView', newView);
   };
-  //clear search
+  
+  // clear search input and filters
   const handleClearSearch = () => {
     setSearchInput('');
     clearFilters();
   };
-  //category click
+  
+  // handle category filter selection
   const handleCategoryClick = (cat) => {
     setSearchInput('');
     filterByCategory(cat);
   };
-  //open & close & confirm delete modal
+  
+  // delete modal handlers
   const handleDeleteClick = (product) => {
     setDeleteModal({ open: true, product });
   };
@@ -199,7 +201,7 @@ function Products() {
     }
   };
 
-  //page numbers for pagination
+  // calculate page numbers to display in pagination
   const pageNumbers = useMemo(() => {
     const pages = [];
     const maxVisible = 5;
@@ -223,7 +225,7 @@ function Products() {
     return pages;
   }, [page, totalPages]);
 
-//animate
+  // animation variants for framer motion
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -235,7 +237,7 @@ function Products() {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0 },
   };
-  //loading skeletons
+  // render loading skeleton placeholders
   const renderSkeletons = () => (
     <div className={styles.grid}>
       {Array.from({ length: 6 }).map((_, i) => (
@@ -267,7 +269,7 @@ function Products() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
             onClick={() => stat.filterKey && filterByStock(stat.filterKey)}
-            style={{ cursor: stat.filterKey ? 'pointer' : 'default' }}
+            data-clickable={stat.filterKey ? 'true' : 'false'}
           >
             <div
               className={styles.statIcon}
@@ -282,7 +284,7 @@ function Products() {
           </motion.div>
         ))}
       </div>
-      {/*page header*/}
+      {/* page header with title and actions */}
       <div className={styles.header}>
         <div className={styles.titleSection}>
           <h1 className={styles.title}>
@@ -292,7 +294,7 @@ function Products() {
         </div>
 
         <div className={styles.actions}>
-          {/*search*/}
+          {/* search input */}
           <div className={styles.searchWrapper}>
             <Search size={18} className={styles.searchIcon} />
             <input
@@ -320,27 +322,24 @@ function Products() {
         </div>
       </div>
 
-      {/*category list*/}
-      <div className={styles.filterChips}>
-        <button
-          className={`${styles.chip} ${category === 'all' ? styles.chipActive : ''}`}
-          onClick={() => handleCategoryClick('all')}
+      {/* category filter dropdown */}
+      <div className={styles.categoryFilter}>
+        <label className={styles.filterLabel}>Filter by Category</label>
+        <select
+          className={styles.categorySelect}
+          value={category}
+          onChange={(e) => handleCategoryClick(e.target.value)}
         >
-          <Package size={14} />
-          All Products
-        </button>
-        {categories.filter(cat => cat).map((cat) => (
-          <button
-            key={cat}
-            className={`${styles.chip} ${category === cat ? styles.chipActive : ''}`}
-            onClick={() => handleCategoryClick(cat)}
-          >
-            {capitalize(String(cat).replace(/-/g, ' '))}
-          </button>
-        ))}
+          <option value="all">All Products</option>
+          {categories.filter(cat => cat).map((cat) => (
+            <option key={cat} value={cat}>
+              {capitalize(String(cat).replace(/-/g, ' '))}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* state when serach*/}
+      {/* active filters indicator */}
       {(isSearching || category !== 'all' || stockFilter) && (
         <motion.div
           className={styles.searchStatus}
@@ -365,7 +364,7 @@ function Products() {
           </button>
         </motion.div>
       )}
-      {/*if errore state*/}
+      {/* error state */}
       {error && (
         <motion.div
           className={styles.error}
@@ -379,10 +378,10 @@ function Products() {
           </Button>
         </motion.div>
       )}
-      {/*loading*/}
+      {/* loading state */}
       {loading && renderSkeletons()}
 
-      {/*empty no products founded*/}
+      {/* empty state when no products found */}
       {!loading && !error && products.length === 0 && (
         <motion.div
           className={styles.emptyState}
@@ -413,7 +412,7 @@ function Products() {
         </motion.div>
       )}
 
-      {/*product grid animate*/}
+      {/* product grid view with animation */}
       <AnimatePresence mode="wait">
         {!loading && !error && products.length > 0 && view === 'grid' && (
           <motion.div
@@ -432,7 +431,7 @@ function Products() {
           </motion.div>
         )}
 
-        {/*product table animate*/}
+        {/* product table view with animation */}
         {!loading && !error && products.length > 0 && view === 'table' && (
           <motion.div
             key="table"
@@ -445,7 +444,7 @@ function Products() {
         )}
       </AnimatePresence>
 
-      {/*paginate*/}
+      {/* pagination controls */}
       {!loading && !error && totalPages > 1 && (
         <motion.div
           className={styles.pagination}
@@ -490,7 +489,7 @@ function Products() {
           </div>
         </motion.div>
       )}
-      {/* delete confirmation*/}
+      {/* delete confirmation modal */}
       <Modal
         isOpen={deleteModal.open}
         onClose={closeDeleteModal}

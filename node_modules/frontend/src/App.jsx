@@ -9,6 +9,8 @@ import Categories from './pages/Categories';
 import CategoryDetail from './pages/CategoryDetail';
 import AddCategory from './pages/AddCategory';
 import EditCategory from './pages/EditCategory';
+import Orders from './pages/Orders';
+import OrderDetail from './pages/OrderDetail';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -18,26 +20,30 @@ function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      {/* here is protect routes need to be loggedin */}
+      {/* protected routes that require login */}
       <Route element={<ProtectedRoute />}>
         <Route element={<DashboardLayout />}>
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />   {/*just loggedin root to dashboard */}
-          <Route path="/dashboard" element={<Dashboard />} />   {/*for dash home*/}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/dashboard" element={<Dashboard />} />
 
-          {/*the nested and dynamic rout*/}
+          {/* product routes */}
           <Route path="/products" element={<Products />} />
           <Route path="/products/new" element={<AddProduct />} />
           <Route path="/products/:id" element={<ProductDetail />} />
           <Route path="/products/:id/edit" element={<EditProduct />} />
           
-          {/* Category routes */}
+          {/* category routes */}
           <Route path="/categories" element={<Categories />} />
           <Route path="/categories/new" element={<AddCategory />} />
           <Route path="/categories/:id" element={<CategoryDetail />} />
           <Route path="/categories/:id/edit" element={<EditCategory />} />
+          
+          {/* order routes */}
+          <Route path="/orders" element={<Orders />} />
+          <Route path="/orders/:id" element={<OrderDetail />} />
         </Route>
       </Route>
-      {/*if no page*/}
+      {/* 404 page for unmatched routes */}
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\OrderController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -47,4 +48,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('/products/add', [ProductController::class, 'store']);
     Route::put('/products/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+});
+
+//Order routes
+Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::get('/orders', [OrderController::class, 'index']);
+    Route::get('/orders/{id}', [OrderController::class, 'show']);
+    Route::put('/orders/{id}', [OrderController::class, 'update']);
+    Route::delete('/orders/{id}', [OrderController::class, 'destroy']);
 });

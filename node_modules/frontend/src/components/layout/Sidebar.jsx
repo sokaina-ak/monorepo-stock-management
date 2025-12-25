@@ -10,10 +10,10 @@ import {
   ChevronsRight,
   FileQuestion,
   Tag,
+  ShoppingCart,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
-import Avatar from '../common/Avatar';
 import styles from './Sidebar.module.css';
 
 
@@ -27,9 +27,10 @@ function Sidebar({ isOpen, setIsOpen }) {
     { label: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { label: 'Products', href: '/products', icon: Package },
     { label: 'Categories', href: '/categories', icon: Tag },
+    { label: 'Orders', href: '/orders', icon: ShoppingCart },
     { label: 'Reports', href: '/reports', icon: FileQuestion },
   ];
-  // logout
+  // handle logout
   const handleLogout = () => {
     logout();
     showToast('Logged out successfully', 'info');
@@ -38,14 +39,14 @@ function Sidebar({ isOpen, setIsOpen }) {
 
   return (
     <>
-      {/*desktop sidebar */}
+      {/* desktop sidebar */}
       <motion.aside
         className={styles.sidebar}
         animate={{ width: isOpen ? 260 : 72 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
       >
-        <div className={styles.gradientStrip} />{/* strip high*/}
-        {/*logo and title */}
+        <div className={styles.gradientStrip} />
+        {/* logo and title section */}
         <div className={styles.titleSection}>
           <div className={styles.logoWrapper}>
             <div className={styles.logo}>
@@ -66,7 +67,7 @@ function Sidebar({ isOpen, setIsOpen }) {
             </AnimatePresence>
           </div>
         </div>
-        {/* nav links */}
+        {/* navigation links */}
         <nav className={styles.nav}>
           {navLinks.map((link) => (
             <NavLink
@@ -96,32 +97,8 @@ function Sidebar({ isOpen, setIsOpen }) {
           ))}
         </nav>
 
-        {/* user at bottom */}
+        {/* logout button at bottom */}
         <div className={styles.userSection}>
-          <div className={styles.userInfo}>
-            <Avatar
-              name={`${user?.firstName} ${user?.lastName}`}
-              src={user?.image}
-              size="sm"
-            />
-            <AnimatePresence>
-              {isOpen && (
-                <motion.div
-                  className={styles.userDetails}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -10 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <span className={styles.userName}>
-                    {user?.firstName} {user?.lastName}
-                  </span>
-                  <span className={styles.userEmail}>{user?.email}</span>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           <button
             className={styles.logoutButton}
             onClick={handleLogout}
@@ -244,21 +221,8 @@ function Sidebar({ isOpen, setIsOpen }) {
                 ))}
               </nav>
 
-              {/* User section at bottom */}
+              {/* Logout button at bottom */}
               <div className={styles.userSection}>
-                <div className={styles.userInfo}>
-                  <Avatar
-                    name={`${user?.firstName} ${user?.lastName}`}
-                    src={user?.image}
-                    size="sm"
-                  />
-                  <div className={styles.userDetails}>
-                    <span className={styles.userName}>
-                      {user?.firstName} {user?.lastName}
-                    </span>
-                    <span className={styles.userEmail}>{user?.email}</span>
-                  </div>
-                </div>
                 <button className={styles.logoutButton} onClick={handleLogout}>
                   <LogOut size={18} />
                   <span>Logout</span>

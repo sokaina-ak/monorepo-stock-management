@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+._*
+
+# Temporary files
+*.tmp
+*.temp
+
+# React admin dashboard (temporary reference folder)
+apps/react-admin-dashboard/
+
+# Documentation (optional - you may want to keep these)
+# INTEGRATION_SUMMARY.md
+# PACKAGES_TO_INSTALL.md
+

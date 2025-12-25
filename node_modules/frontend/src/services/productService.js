@@ -1,17 +1,18 @@
 import api from './api';
 
 const productService = {
-  //numbers of cards can see
+  // get all products with pagination
   getAll: async (limit = 10, skip = 0) => {
     const response = await api.get(`/products?limit=${limit}&skip=${skip}`);
-    // Backend returns array directly
+    // backend returns array directly
     const products = Array.isArray(response.data) ? response.data : [];
     return {
       products,
-      total: products.length, // Backend doesn't return total, use length for now
+      total: products.length, // backend doesn't return total, so use array length for now
     };
   },
-  //search and formate pagination
+  
+  // search products with pagination
   search: async (query, limit = 10, skip = 0) => {
     const response = await api.get(`/products/search?q=${encodeURIComponent(query)}&limit=${limit}&skip=${skip}`);
     const products = Array.isArray(response.data) ? response.data : [];
@@ -26,25 +27,26 @@ const productService = {
     return response.data;
   },
   
+  // get list of categories
   getCategories: async () => {
     const response = await api.get('/products/category-list');
-    // Backend returns array of category objects with id, name, slug, parent
+    // backend returns array of category objects with id, name, slug, parent
     const categories = response.data;
-    console.log('productService.getCategories - Raw response:', categories); // Debug log
     if (!Array.isArray(categories)) {
-      console.warn('Categories response is not an array:', categories);
+      console.warn('categories response is not an array:', categories);
       return [];
     }
-    // Extract slugs from category objects, filter out null/undefined
+    // extract slugs from category objects and filter out null/undefined values
     const slugs = categories
       .map(cat => {
         if (typeof cat === 'string') return cat;
         return cat.slug || cat.name || null;
       })
       .filter(cat => cat !== null && cat !== undefined);
-    console.log('productService.getCategories - Extracted slugs:', slugs); // Debug log
     return slugs;
   },
+  
+  // get products by category with pagination
   getByCategory: async (category, limit = 10, skip = 0) => {
     const response = await api.get(`/products/category/${category}?limit=${limit}&skip=${skip}`);
     const products = Array.isArray(response.data) ? response.data : [];
