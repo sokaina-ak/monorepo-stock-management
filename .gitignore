@@ -28,10 +28,8 @@ Thumbs.db
 *.tmp
 *.temp
 
-# React admin dashboard (temporary reference folder)
+# React admin dashboard 
 apps/react-admin-dashboard/
 
-# Documentation (optional - you may want to keep these)
-# INTEGRATION_SUMMARY.md
-# PACKAGES_TO_INSTALL.md
+
 
